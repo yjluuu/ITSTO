@@ -47,10 +47,13 @@ namespace ITSTOAPI
             //AutoMapper
             services.AddAutoMapper(typeof(AutoMapperConfigures));
 
+            #region ×¢Èë
             services.AddTransient<Bo.Interface.IRepository.IRepositoryFactory, Bo.Repository.RepositoryFactory>();
             services.AddTransient<Bo.Interface.IBusiness.ITestService, Bo.Business.TestService>();
             services.AddTransient<Bo.Interface.IBusiness.IStoreService, Bo.Business.StoreService>();
             services.AddTransient<Bo.Interface.IBusiness.IInterfaceUserService, Bo.Business.InterfaceUserService>();
+            services.AddTransient<Bo.Interface.IBusiness.IInterfaceMappingService, Bo.Business.InterfaceMappingService>();
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

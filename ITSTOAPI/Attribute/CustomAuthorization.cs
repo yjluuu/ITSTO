@@ -18,12 +18,16 @@ namespace ITSTOAPI.Attribute
 {
     public class CustomAuthorization : IAuthorizationFilter
     {
-        private readonly ILogger _log = new Log4NetProvider().CreateLogger();
+        //private readonly ILogger _log = new Log4NetProvider().CreateLogger();
+        private readonly ILogger<CustomAuthorization> _log;
         private readonly IInterfaceUserService interfaceUserService;
+        private readonly IInterfaceMappingService interfaceMappingService;
         private IConfiguration Configuration { get; }
-        public CustomAuthorization(IInterfaceUserService interfaceUserService, IConfiguration Configuration)
+        public CustomAuthorization(ILogger<CustomAuthorization> _log, IInterfaceUserService interfaceUserService, IInterfaceMappingService interfaceMappingService, IConfiguration Configuration)
         {
+            this._log = _log;
             this.interfaceUserService = interfaceUserService;
+            this.interfaceMappingService = interfaceMappingService;
             this.Configuration = Configuration;
         }
 
@@ -44,7 +48,7 @@ namespace ITSTOAPI.Attribute
                 interfaceUser = interfaceUserService.GetInterfaceUserByUser(new InterfaceUser() { User = user });
                 if (interfaceUser == null)
                 {
-                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "接口用户名不正确") { });
+                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.ParamError, "接口用户名不正确") { });
                     OnAuthEnd(context);
                     return;
                 }
@@ -74,7 +78,7 @@ namespace ITSTOAPI.Attribute
                 }
                 if (!new System.Text.RegularExpressions.Regex(@"^\d{10}$").IsMatch(requestTime))
                 {
-                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "RequestTime格式错误") { });
+                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.ParamError, "RequestTime格式错误") { });
                     OnAuthEnd(context);
                     return;
                 }
@@ -98,7 +102,7 @@ namespace ITSTOAPI.Attribute
                 long time = Convert.ToInt64(requestTime);
                 if (System.Math.Abs(date - time) > 5 * 60)
                 {
-                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "签名已过期") { });
+                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.SignatureError, "签名已过期") { });
                     OnAuthEnd(context);
                     return;
                 }
@@ -106,7 +110,7 @@ namespace ITSTOAPI.Attribute
                 var sign = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}&&&{interfaceUser.Pass}&&&{requestTime}&&&{nonce}"));
                 if (!signature.Equals(sign))
                 {
-                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "签名错误") { });
+                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.SignatureError, "签名错误") { });
                     OnAuthEnd(context);
                     return;
                 }
@@ -118,11 +122,14 @@ namespace ITSTOAPI.Attribute
                 }
                 else
                 {
-                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "请求忒频繁咯") { });
+                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.RepeatOperation, "请求忒频繁咯") { });
                     OnAuthEnd(context);
                     return;
                 }
             }
+            #endregion
+            #region 判断是否有调用接口的权限
+            VerificationJurisdiction(context, interfaceUser);
             #endregion
         }
 
@@ -130,6 +137,39 @@ namespace ITSTOAPI.Attribute
         {
             context.HttpContext.Response.StatusCode = 200;
             context.HttpContext.Response.ContentType = "application/json";
+        }
+
+        private void VerificationJurisdiction(AuthorizationFilterContext context, InterfaceUser interfaceUser)
+        {
+            string wholePath = context.HttpContext.Request.Path.ToString();
+            int secondSlash = wholePath.IndexOf("/", wholePath.IndexOf("/") + 1 + 1);
+            string path = wholePath.Substring(secondSlash);
+            var isExistsKey = RedisClient.redisClient.KeyExists($"Api.InterfaceMapping:{interfaceUser.User}");
+            if (!isExistsKey)
+            {
+                var interfaceMappingRes = interfaceMappingService.GetInterfaceMappingByUser(new InterfaceMapping { Brand = interfaceUser.Brand, InterfaceUserId = interfaceUser.Id });
+                if (interfaceMappingRes != null && interfaceMappingRes.Any())
+                {
+                    foreach (var item in interfaceMappingRes)
+                    {
+                        RedisClient.redisClient.SetHashKey<string>($"Api.InterfaceMapping:{interfaceUser.User}", item.InterfacePath, item.InterfaceUserId.ToString());
+                    }
+                }
+                else
+                {
+                    context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.SystemError, "没有配置用户接口权限") { });
+                    OnAuthEnd(context);
+                    return;
+                }
+            }
+            var redisInterfaceMapping = RedisClient.redisClient.GetHashKey($"Api.InterfaceMapping:{interfaceUser.User}", path);
+            if (string.IsNullOrEmpty(redisInterfaceMapping))
+            {
+                context.Result = new JsonResult(new ApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoAuthority, "没有权限") { });
+                OnAuthEnd(context);
+                return;
+            }
+
         }
     }
 }

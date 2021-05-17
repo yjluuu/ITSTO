@@ -40,5 +40,11 @@ namespace ITSTOAPI.Controllers
             log.LogInformation($"获取门店信息返回结果：{JsonConvert.SerializeObject(returnStore)}");
             return Ok(returnStore);
         }
+
+        [HttpPost]
+        public IActionResult GetKKK()
+        {
+            return Ok("ok");
+        }
     }
 }

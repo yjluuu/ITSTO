@@ -17,7 +17,12 @@ namespace ITSTOAPI.Attribute
 {
     public class CustomActionFilterAttribute : ActionFilterAttribute
     {
-        private readonly ILogger _log = new Log4NetProvider().CreateLogger();
+        //private readonly ILogger _log = new Log4NetProvider().CreateLogger();
+        private readonly ILogger<CustomActionFilterAttribute> _log;
+        public CustomActionFilterAttribute(ILogger<CustomActionFilterAttribute> _log)
+        {
+            this._log = _log;
+        }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {

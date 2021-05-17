@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ITSTOAPI.Controllers
 {
     [Route("api/[controller]/[action]")]
-    //[CustomActionFilter]
+    //[TypeFilter(typeof(CustomActionFilterAttribute))]
     [ApiController]
     public class BaseController : ControllerBase
     {

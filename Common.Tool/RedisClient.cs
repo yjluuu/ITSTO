@@ -75,6 +75,20 @@ namespace Common.Tool
             return db.StringGet(key);
         }
 
+        public bool SetHashKey<T>(string key, string dataKey, T t)
+        {
+            return db.HashSet(key, dataKey, JsonConvert.SerializeObject(t));
+        }
+
+        public string GetHashKey(string key, string dataKey)
+        {
+            return db.HashGet(key, dataKey);
+        }
+
+        public bool KeyExists(string key)
+        {
+            return db.KeyExists(key);
+        }
 
         /// <summary>
         /// 获取一个key的对象

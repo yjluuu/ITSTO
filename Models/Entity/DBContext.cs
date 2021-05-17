@@ -12,6 +12,7 @@ namespace Routine.Models.Entity
         public virtual DbSet<Test> Test { get; set; }
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<InterfaceUser> InterfaceUser { get; set; }
+        public virtual DbSet<InterfaceMapping> InterfaceMapping { get; set; }
 
 
         //public DBContext() { }
