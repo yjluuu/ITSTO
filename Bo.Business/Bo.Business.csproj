@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bo.Interface\Bo.Interface.csproj" />
+    <ProjectReference Include="..\Common.Tool\Common.Tool.csproj" />
+    <ProjectReference Include="..\Models\Routine.Models.csproj" />
+  </ItemGroup>
+
+</Project>
