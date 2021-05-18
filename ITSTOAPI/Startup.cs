@@ -38,6 +38,7 @@ namespace ITSTOAPI
             services.AddDbContext<DBContext>(options => { options.UseMySql(Configuration.GetConnectionString("connStr")); }, ServiceLifetime.Scoped);
             //redis链接
             RedisClient.redisClient.InitConnect(Configuration);
+            services.AddControllers(options => { options.Filters.Add(typeof(CustomResourceAttribute)); });
             //添加全局的Authorization过滤器
             services.AddControllers(options => { options.Filters.Add(typeof(CustomAuthorization)); });
             //添加全局的Action过滤器

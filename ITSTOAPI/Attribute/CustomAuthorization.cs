@@ -1,5 +1,6 @@
 ﻿using Bo.Interface.IBusiness;
 using Common.Tool;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
@@ -19,13 +20,14 @@ namespace ITSTOAPI.Attribute
     public class CustomAuthorization : IAuthorizationFilter
     {
         //private readonly ILogger _log = new Log4NetProvider().CreateLogger();
-        private readonly ILogger<CustomAuthorization> _log;
+        //private readonly ILogger<CustomAuthorization> _log;
+        private readonly ILog _log;
         private readonly IInterfaceUserService interfaceUserService;
         private readonly IInterfaceMappingService interfaceMappingService;
         private IConfiguration Configuration { get; }
-        public CustomAuthorization(ILogger<CustomAuthorization> _log, IInterfaceUserService interfaceUserService, IInterfaceMappingService interfaceMappingService, IConfiguration Configuration)
+        public CustomAuthorization(IInterfaceUserService interfaceUserService, IInterfaceMappingService interfaceMappingService, IConfiguration Configuration)
         {
-            this._log = _log;
+            this._log = LogManager.GetLogger(typeof(CustomAuthorization));
             this.interfaceUserService = interfaceUserService;
             this.interfaceMappingService = interfaceMappingService;
             this.Configuration = Configuration;
@@ -106,7 +108,7 @@ namespace ITSTOAPI.Attribute
                     OnAuthEnd(context);
                     return;
                 }
-                //Signature生成规则：user+&&&+pass+&&&+requestTime+&&&+nonce生成字符串进行aes加密
+                //Signature生成规则：user+&&&+pass+&&&+requestTime+&&&+nonce生成字符串进行加密
                 var sign = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}&&&{interfaceUser.Pass}&&&{requestTime}&&&{nonce}"));
                 if (!signature.Equals(sign))
                 {
@@ -139,6 +141,11 @@ namespace ITSTOAPI.Attribute
             context.HttpContext.Response.ContentType = "application/json";
         }
 
+        /// <summary>
+        /// 验证接口用户是否有调用接口的权限
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="interfaceUser"></param>
         private void VerificationJurisdiction(AuthorizationFilterContext context, InterfaceUser interfaceUser)
         {
             string wholePath = context.HttpContext.Request.Path.ToString();

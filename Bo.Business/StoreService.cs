@@ -17,7 +17,6 @@ namespace Bo.Business
 
         public Store GetSores(RequestStore requestStore)
         {
-            string ssss = RedisClient.redisClient.GetStringKey("mykey");
             var storeService = this.CreateService<Store>();
             return storeService.Where(t => t.Brand == requestStore.Brand && t.IsDeleted == false).FirstOrDefault();
         }
