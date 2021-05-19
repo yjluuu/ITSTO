@@ -23,5 +23,13 @@ namespace Routine.Models.ApiEntityResponse
             StatusCode = (int)statusCodeEnum;
             Msg = message;
         }
+
+        public ApiBaseResponse GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum statusCodeEnum, string message)
+        {
+            IsSuccess = false;
+            StatusCode = (int)statusCodeEnum;
+            Msg = message;
+            return this;
+        }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Routine.Models.ApiEntityRequest;
 using Routine.Models.ApiEntityResponse;
+using Routine.Models.EnmuEntity;
 using Routine.Models.Entity;
 using System;
 using System.Collections.Generic;
@@ -31,14 +32,21 @@ namespace ITSTOAPI.Controllers
         [HttpPost]
         public IActionResult GetStores(RequestStore requestStore)
         {
+            ApiBaseResponse response = new ApiBaseResponse();
             _log.Info($"获取门店信息入参：{JsonConvert.SerializeObject(requestStore)}");
+            if (string.IsNullOrEmpty(requestStore.Brand))
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Brand不能为空");
+                return Ok(response);
+            }
             Store store = storeService.GetSores(requestStore);
             _log.Info($"获取门店信息查询结果：{JsonConvert.SerializeObject(store)}");
             List<string> storeTagList = store.StoreTags.Split(',').ToList();
             var returnStore = mapper.Map<ResponseStore>(store);
             returnStore.StoreTagList = storeTagList;
             _log.Info($"获取门店信息返回结果：{JsonConvert.SerializeObject(returnStore)}");
-            return Ok(returnStore);
+            response.ReturnObj = returnStore;
+            return Ok(response);
         }
 
     }

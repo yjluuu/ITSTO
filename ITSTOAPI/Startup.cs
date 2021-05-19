@@ -54,6 +54,8 @@ namespace ITSTOAPI
             services.AddTransient<Bo.Interface.IBusiness.IStoreService, Bo.Business.StoreService>();
             services.AddTransient<Bo.Interface.IBusiness.IInterfaceUserService, Bo.Business.InterfaceUserService>();
             services.AddTransient<Bo.Interface.IBusiness.IInterfaceMappingService, Bo.Business.InterfaceMappingService>();
+            services.AddTransient<Bo.Interface.IBusiness.IDishCategoryService, Bo.Business.DishCategoryService>();
+            services.AddTransient<Bo.Interface.IBusiness.IDishService, Bo.Business.DishService>();
             #endregion
         }
 

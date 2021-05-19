@@ -12,6 +12,8 @@ namespace Common.Tool
         public AutoMapperConfigures()
         {
             CreateMap<Store, ResponseStore>();
+            CreateMap<DishCategory, ResponseDishs>();
+            CreateMap<Dish, ResponseDish>();
         }
     }
 }

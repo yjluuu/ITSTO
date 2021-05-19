@@ -13,6 +13,8 @@ namespace Routine.Models.Entity
         public virtual DbSet<Store> Store { get; set; }
         public virtual DbSet<InterfaceUser> InterfaceUser { get; set; }
         public virtual DbSet<InterfaceMapping> InterfaceMapping { get; set; }
+        public virtual DbSet<DishCategory> DishCategory { get; set; }
+        public virtual DbSet<Dish> Dish { get; set; }
 
 
         //public DBContext() { }
