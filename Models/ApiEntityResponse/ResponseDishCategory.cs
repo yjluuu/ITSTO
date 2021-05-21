@@ -4,18 +4,20 @@ using System.Text;
 
 namespace Routine.Models.ApiEntityResponse
 {
-    public class ResponseDishs
+    public class ResponseDishCategory
     {
+        public int Id { get; set; }
         public string Brand { get; set; }
         public string StoreCode { get; set; }
         public string DishCategoryName { get; set; }
         public string DishCategoryCode { get; set; }
         public int Order { get; set; }
-        public List<ResponseDish> DishList { get; set; }
+        public List<int> DishIds { get; set; }
     }
 
     public class ResponseDish
     {
+        public int Id { get; set; }
         public string Brand { get; set; }
         public string DishCategoryCode { get; set; }
         public string DishName { get; set; }

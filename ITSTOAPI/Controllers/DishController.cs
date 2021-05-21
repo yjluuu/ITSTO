@@ -49,14 +49,14 @@ namespace ITSTOAPI.Controllers
             _log.Info($"获取菜品分类信息查询结果：{JsonConvert.SerializeObject(dishCategorys)}");
             var dishs = _dishService.GetAllDishs(new Dish { Brand = requestDishCategory.Brand }).ToList();
             _log.Info($"获取菜品详情信息查询结果：{JsonConvert.SerializeObject(dishs)}");
-            var responseDishs = mapper.Map<List<ResponseDishs>>(dishCategorys);
+            var responseDishCategory = mapper.Map<List<ResponseDishCategory>>(dishCategorys);
             var responseDishList= mapper.Map<List<ResponseDish>>(dishs);
-            foreach (var item in responseDishs)
+            foreach (var item in responseDishCategory)
             {
-                item.DishList = responseDishList.Where(d => d.DishCategoryCode == item.DishCategoryCode).ToList();
+                item.DishIds = responseDishList.Where(d => d.DishCategoryCode == item.DishCategoryCode).Select(d => d.Id).ToList();
             }
-            _log.Info($"获取菜品信息返回结果：{JsonConvert.SerializeObject(responseDishs)}");
-            response.ReturnObj = responseDishs;
+            response.ReturnObj = new { DishCategory = responseDishCategory, Dishs = responseDishList };
+            _log.Info($"获取菜品信息返回结果：{JsonConvert.SerializeObject(response.ReturnObj)}");
             return Ok(response);
         }
     }

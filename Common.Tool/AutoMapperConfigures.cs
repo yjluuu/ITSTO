@@ -12,7 +12,7 @@ namespace Common.Tool
         public AutoMapperConfigures()
         {
             CreateMap<Store, ResponseStore>();
-            CreateMap<DishCategory, ResponseDishs>();
+            CreateMap<DishCategory, ResponseDishCategory>();
             CreateMap<Dish, ResponseDish>();
         }
     }
