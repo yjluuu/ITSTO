@@ -30,4 +30,11 @@ namespace Routine.Models.ApiEntityResponse
         public int Status { get; set; }
         public string Remark { get; set; }
     }
+
+
+    public class ResponseDishCompose
+    {
+        public List<ResponseDishCategory> DishCategorys { get; set; }
+        public Dictionary<int, ResponseDish> Dishs { get; set; }
+    }
 }

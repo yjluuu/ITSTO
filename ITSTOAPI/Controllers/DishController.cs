@@ -50,12 +50,17 @@ namespace ITSTOAPI.Controllers
             var dishs = _dishService.GetAllDishs(new Dish { Brand = requestDishCategory.Brand }).ToList();
             _log.Info($"获取菜品详情信息查询结果：{JsonConvert.SerializeObject(dishs)}");
             var responseDishCategory = mapper.Map<List<ResponseDishCategory>>(dishCategorys);
-            var responseDishList= mapper.Map<List<ResponseDish>>(dishs);
+            var responseDishList = mapper.Map<List<ResponseDish>>(dishs);
             foreach (var item in responseDishCategory)
             {
                 item.DishIds = responseDishList.Where(d => d.DishCategoryCode == item.DishCategoryCode).Select(d => d.Id).ToList();
             }
-            response.ReturnObj = new { DishCategory = responseDishCategory, Dishs = responseDishList };
+            Dictionary<int, ResponseDish> dic = new Dictionary<int, ResponseDish>();
+            foreach (var item in responseDishList)
+            {
+                dic.Add(item.Id, item);
+            }
+            response.ReturnObj = JsonConvert.SerializeObject(new ResponseDishCompose() { DishCategorys = responseDishCategory, Dishs = dic });
             _log.Info($"获取菜品信息返回结果：{JsonConvert.SerializeObject(response.ReturnObj)}");
             return Ok(response);
         }
