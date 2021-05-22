@@ -55,12 +55,12 @@ namespace ITSTOAPI.Controllers
             {
                 item.DishIds = responseDishList.Where(d => d.DishCategoryCode == item.DishCategoryCode).Select(d => d.Id).ToList();
             }
-            Dictionary<int, ResponseDish> dic = new Dictionary<int, ResponseDish>();
+            Dictionary<string, ResponseDish> dic = new Dictionary<string, ResponseDish>();
             foreach (var item in responseDishList)
             {
-                dic.Add(item.Id, item);
+                dic.Add(item.Id.ToString(), item);
             }
-            response.ReturnObj = JsonConvert.SerializeObject(new ResponseDishCompose() { DishCategorys = responseDishCategory, Dishs = dic });
+            response.ReturnObj = new ResponseDishCompose() { DishCategorys = responseDishCategory, Dishs = dic };
             _log.Info($"获取菜品信息返回结果：{JsonConvert.SerializeObject(response.ReturnObj)}");
             return Ok(response);
         }
