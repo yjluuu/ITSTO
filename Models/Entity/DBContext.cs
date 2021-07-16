@@ -15,6 +15,7 @@ namespace Routine.Models.Entity
         public virtual DbSet<InterfaceMapping> InterfaceMapping { get; set; }
         public virtual DbSet<DishCategory> DishCategory { get; set; }
         public virtual DbSet<Dish> Dish { get; set; }
+        public virtual DbSet<InterfaceLogs> InterfaceLogs { get; set; }
 
 
         //public DBContext() { }

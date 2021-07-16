@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Http;
 
 namespace ITSTOAPI
 {
@@ -49,6 +51,7 @@ namespace ITSTOAPI
             services.AddAutoMapper(typeof(AutoMapperConfigures));
 
             #region ×¢Èë
+            services.AddTransient<Bo.Interface.IBusiness.IInterfaceLogsService, Bo.Business.InterfaceLogsService>();
             services.AddTransient<Bo.Interface.IRepository.IRepositoryFactory, Bo.Repository.RepositoryFactory>();
             services.AddTransient<Bo.Interface.IBusiness.ITestService, Bo.Business.TestService>();
             services.AddTransient<Bo.Interface.IBusiness.IStoreService, Bo.Business.StoreService>();
@@ -66,6 +69,14 @@ namespace ITSTOAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+
+
+            app.Use((context, next) =>
+            {
+                context.Request.EnableBuffering();
+                return next();
+            });
+
 
             app.UseRouting();
 
