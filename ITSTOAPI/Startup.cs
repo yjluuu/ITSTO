@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ITSTOAPI
 {
@@ -49,6 +50,8 @@ namespace ITSTOAPI
             services.AddControllers(options => { options.Filters.Add(typeof(CustomExceptionFilterAttribute)); });
             //AutoMapper
             services.AddAutoMapper(typeof(AutoMapperConfigures));
+            //Ìí¼Óhttpcontext
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             #region ×¢Èë
             services.AddTransient<Bo.Interface.IBusiness.IInterfaceLogsService, Bo.Business.InterfaceLogsService>();

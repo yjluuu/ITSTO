@@ -16,6 +16,7 @@ namespace Routine.Models.Entity
         public virtual DbSet<DishCategory> DishCategory { get; set; }
         public virtual DbSet<Dish> Dish { get; set; }
         public virtual DbSet<InterfaceLogs> InterfaceLogs { get; set; }
+        public virtual DbSet<AppSetting> AppSetting { get; set; }
 
 
         //public DBContext() { }
