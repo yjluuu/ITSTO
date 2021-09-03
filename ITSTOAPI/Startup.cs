@@ -26,12 +26,13 @@ namespace ITSTOAPI
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+       
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -62,6 +63,7 @@ namespace ITSTOAPI
             services.AddTransient<Bo.Interface.IBusiness.IInterfaceMappingService, Bo.Business.InterfaceMappingService>();
             services.AddTransient<Bo.Interface.IBusiness.IDishCategoryService, Bo.Business.DishCategoryService>();
             services.AddTransient<Bo.Interface.IBusiness.IDishService, Bo.Business.DishService>();
+            services.AddTransient<Bo.Interface.IBusiness.IAppSettingService, Bo.Business.AppSettingService>();
             #endregion
         }
 
