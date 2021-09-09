@@ -47,7 +47,8 @@ namespace ITSTOAPI.Attribute
             }
             //log4配置了往表里写日志，但是写不进去，不知道啥问题
             //_log.Info(new InterfaceLoggerInfo(string.Empty, path, requestContext, JsonConvert.SerializeObject(context.Result)));
-            interfaceLogsService.LogInterface(new InterfaceLogs { LogThread = Thread.CurrentThread.ManagedThreadId.ToString(), LogLevel = "Info", Url = path, Request = requestContext, Response = JsonConvert.SerializeObject(((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value), LogDate = DateTime.Now });
+            //这样记日志回影响代码逻辑，代码里不savechanges时到这里总会savechanges
+            //interfaceLogsService.LogInterface(new InterfaceLogs { LogThread = Thread.CurrentThread.ManagedThreadId.ToString(), LogLevel = "Info", Url = path, Request = requestContext, Response = JsonConvert.SerializeObject(((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value), LogDate = DateTime.Now });
             _log.Info($@"$$$》Controller：{((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ControllerName}，Action:{((Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)context.ActionDescriptor).ActionName}，Response:{JsonConvert.SerializeObject(((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value)}。");
 
         }

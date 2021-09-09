@@ -5,16 +5,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Bo.Interface.IBusiness;
+using log4net;
 
 namespace Bo.Business
 {
     public class InterfaceMappingService : BaseService, IInterfaceMappingService
     {
-        public InterfaceMappingService(IRepositoryFactory repositoryFactory, DBContext _dbContext) : base(repositoryFactory, _dbContext) { }
+        private readonly ILog _log;
+        private readonly IRepository<InterfaceMapping> interfaceMappingService;
+        public InterfaceMappingService(IRepositoryFactory repositoryFactory, DBContext _dbContext) : base(repositoryFactory, _dbContext)
+        {
+            this._log = LogManager.GetLogger(typeof(InterfaceMappingService));
+            this.interfaceMappingService = this.CreateService<InterfaceMapping>();
+        }
 
         public IQueryable<InterfaceMapping> GetInterfaceMappingByUser(InterfaceMapping interfaceMapping)
         {
-            var interfaceMappingService = this.CreateService<InterfaceMapping>();
             return interfaceMappingService.Where(i => !i.IsDeleted && i.Brand == interfaceMapping.Brand && i.InterfaceUserId == interfaceMapping.InterfaceUserId);
         }
     }

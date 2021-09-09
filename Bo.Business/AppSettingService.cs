@@ -1,5 +1,6 @@
 ﻿using Bo.Interface.IBusiness;
 using Bo.Interface.IRepository;
+using log4net;
 using Routine.Models.Entity;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,16 @@ namespace Bo.Business
 {
     public class AppSettingService : BaseService, IAppSettingService
     {
-        public AppSettingService(IRepositoryFactory repositoryFactory, DBContext _dbContext) : base(repositoryFactory, _dbContext) { }
+        private readonly ILog _log;
+        private readonly IRepository<AppSetting> appSettingService;
+        public AppSettingService(IRepositoryFactory repositoryFactory, DBContext _dbContext) : base(repositoryFactory, _dbContext)
+        {
+            this._log = LogManager.GetLogger(typeof(AppSettingService));
+            this.appSettingService = this.CreateService<AppSetting>();
+        }
 
         public IQueryable<AppSetting> GetAppSettingByKey(string brand, string appSettingKey)
         {
-            var appSettingService = this.CreateService<AppSetting>();
             return appSettingService.Where(t => !t.IsDeleted && t.Brand == brand && t.AppSettingKey == appSettingKey);
         }
     }

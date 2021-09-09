@@ -21,6 +21,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 
 namespace ITSTOAPI
 {
@@ -32,7 +34,7 @@ namespace ITSTOAPI
             Configuration = configuration;
         }
 
-       
+
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -54,6 +56,17 @@ namespace ITSTOAPI
             //添加httpcontext
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                ////日期类型默认格式化处理 方式1
+                //options.SerializerSettings.Converters.Add(new IsoDateTimeConverter() { DateTimeFormat = "yyyy/MM/dd HH:mm:ss" });
+                ////日期类型默认格式化处理 方式2
+                //options.SerializerSettings.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.MicrosoftDateFormat;
+                //options.SerializerSettings.DateFormatString = "yyyy/MM/dd HH:mm:ss";
+                //空值处理
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
+
             #region 注入
             services.AddTransient<Bo.Interface.IBusiness.IInterfaceLogsService, Bo.Business.InterfaceLogsService>();
             services.AddTransient<Bo.Interface.IRepository.IRepositoryFactory, Bo.Repository.RepositoryFactory>();
@@ -64,6 +77,7 @@ namespace ITSTOAPI
             services.AddTransient<Bo.Interface.IBusiness.IDishCategoryService, Bo.Business.DishCategoryService>();
             services.AddTransient<Bo.Interface.IBusiness.IDishService, Bo.Business.DishService>();
             services.AddTransient<Bo.Interface.IBusiness.IAppSettingService, Bo.Business.AppSettingService>();
+            services.AddTransient<Bo.Interface.IBusiness.IOrdersService, Bo.Business.OrdersService>();
             #endregion
         }
 

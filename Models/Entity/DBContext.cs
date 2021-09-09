@@ -19,6 +19,7 @@ namespace Routine.Models.Entity
         public virtual DbSet<AppSetting> AppSetting { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetail { get; set; }
+        public virtual DbSet<Channel> Channel { get; set; }
 
         //public DBContext() { }
         //public static string conStr { get; set; }

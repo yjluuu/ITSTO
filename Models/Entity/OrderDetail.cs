@@ -7,7 +7,6 @@ namespace Routine.Models.Entity
     public class OrderDetail
     {
         public int Id { get; set; }
-        public string Brand { get; set; }
         public string OrderCode { get; set; }
         public string DishCode { get; set; }
         public int Amount { get; set; }
