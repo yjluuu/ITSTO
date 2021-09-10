@@ -78,6 +78,7 @@ namespace ITSTOAPI
             services.AddTransient<Bo.Interface.IBusiness.IDishService, Bo.Business.DishService>();
             services.AddTransient<Bo.Interface.IBusiness.IAppSettingService, Bo.Business.AppSettingService>();
             services.AddTransient<Bo.Interface.IBusiness.IOrdersService, Bo.Business.OrdersService>();
+            services.AddTransient<Bo.Interface.IBusiness.IChannelService, Bo.Business.ChannelService>();
             #endregion
         }
 
@@ -88,7 +89,6 @@ namespace ITSTOAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-
 
             app.Use((context, next) =>
             {
