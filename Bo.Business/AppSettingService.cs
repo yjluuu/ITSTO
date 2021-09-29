@@ -19,9 +19,9 @@ namespace Bo.Business
             this.appSettingService = this.CreateService<AppSetting>();
         }
 
-        public IQueryable<AppSetting> GetAppSettingByKey(string brand, string appSettingKey)
+        public AppSetting GetAppSettingByKey(string brand, string appSettingKey)
         {
-            return appSettingService.Where(t => !t.IsDeleted && t.Brand == brand && t.AppSettingKey == appSettingKey);
+            return appSettingService.Where(t => !t.IsDeleted && t.Brand == brand && t.AppSettingKey == appSettingKey).FirstOrDefault();
         }
     }
 }

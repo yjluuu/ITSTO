@@ -69,5 +69,11 @@ namespace Bo.Business
             //}
 
         }
+
+
+        public Orders GetOrderByOrderCode(string orderCode)
+        {
+            return orderService.Where(o => !o.IsDeleted && o.OrderCode == orderCode).FirstOrDefault();
+        }
     }
 }

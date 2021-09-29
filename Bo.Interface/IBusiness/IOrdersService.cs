@@ -8,5 +8,6 @@ namespace Bo.Interface.IBusiness
     public interface IOrdersService
     {
         bool NewOrders(Orders orders);
+        Orders GetOrderByOrderCode(string orderCode);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Bo.Interface.IRepository;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Routine.Models.Entity;
 using System;

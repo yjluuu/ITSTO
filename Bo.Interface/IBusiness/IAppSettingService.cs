@@ -8,6 +8,6 @@ namespace Bo.Interface.IBusiness
 {
     public interface IAppSettingService
     {
-        IQueryable<AppSetting> GetAppSettingByKey(string brand, string appSettingKey);
+        AppSetting GetAppSettingByKey(string brand, string appSettingKey);
     }
 }

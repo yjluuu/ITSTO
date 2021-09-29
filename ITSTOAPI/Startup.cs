@@ -79,6 +79,7 @@ namespace ITSTOAPI
             services.AddTransient<Bo.Interface.IBusiness.IAppSettingService, Bo.Business.AppSettingService>();
             services.AddTransient<Bo.Interface.IBusiness.IOrdersService, Bo.Business.OrdersService>();
             services.AddTransient<Bo.Interface.IBusiness.IChannelService, Bo.Business.ChannelService>();
+            services.AddTransient<Bo.Interface.IBusiness.ICustomerService, Bo.Business.CustomerService>();
             #endregion
         }
 

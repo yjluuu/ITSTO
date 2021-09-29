@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Routine.Models.ApiEntityResponse;
+using Routine.Models.Entity.WeChat;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -41,30 +44,51 @@ namespace Common.Tool
         /// <param name="spbill_create_ip">终端ip</param>
         /// <returns></returns>
 
-        public static string Getprepay(string body, string openid, string nonce_str, string out_trade_no, int total_fee,
-                                        string attach, string appid, string mch_id, string partnerkey, string notifyurl,
-                                        string url)
+        public static ResponseWXOrderPayFor Getprepay(WechatOrderPayParam param, string partnerkey, string url)
         {
-            var strA = "appid=" + appid + "&attach=" + attach + "&body=" + body + "&mch_id=" + mch_id + "&nonce_str=" + nonce_str
-                + "&notify_url=" + notifyurl + "&openid=" + openid + "&out_trade_no=" + out_trade_no + "&spbill_create_ip=61.50.221.43&total_fee="
-                + total_fee + "&trade_type=JSAPI";
-            string strk = strA + "&key=" + partnerkey;  //key为商户平台设置的密钥key
+            Dictionary<string, string> map = new Dictionary<string, string>();
+            Type t = param.GetType(); // 获取对象对应的类， 对应的类型
+            PropertyInfo[] pi = t.GetProperties(BindingFlags.Public | BindingFlags.Instance); // 获取当前type公共属性
+            foreach (PropertyInfo p in pi)
+            {
+                MethodInfo m = p.GetGetMethod();
+                if (m != null && m.IsPublic)
+                {
+                    // 进行判NULL处理 
+                    if (m.Invoke(param, new object[] { }) != null)
+                    {
+                        map.Add(p.Name, m.Invoke(param, new object[] { }).ToString()); // 向字典添加元素
+                    }
+                }
+            }
+
+            foreach (var item in map)
+            {
+                if (string.IsNullOrEmpty(item.Value))
+                {
+                    map.Remove(item.Key);
+                }
+            }
+
+            Dictionary<string, string> asciiDic = new Dictionary<string, string>();
+            string[] arrKeys = map.Keys.ToArray();
+            Array.Sort(arrKeys, string.CompareOrdinal);
+            foreach (var key in arrKeys)
+            {
+                string value = map[key];
+                asciiDic.Add(key, value);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in asciiDic)
+            {
+                sb.Append(item.Key).Append("=").Append(item.Value).Append("&");
+            }
+            string strk = sb.Append("key=").Append(partnerkey).ToString();//key为商户平台设置的密钥key
             string strMD5 = MD5(strk).ToUpper();//MD5签名
-                                                //签名
-            var formData = "<xml>";
-            formData += "<appid>" + appid + "</appid>";//appid  
-            formData += "<attach>" + attach + "</attach>"; //附加数据(描述)
-            formData += "<body>" + body + "</body>";//商品描述
-            formData += "<mch_id>" + mch_id + "</mch_id>";//商户号  
-            formData += "<nonce_str>" + nonce_str + "</nonce_str>";//随机字符串，不长于32位。  
-            formData += "<notify_url>" + notifyurl + "</notify_url>";//通知地址
-            formData += "<openid>" + openid + "</openid>";//openid
-            formData += "<out_trade_no>" + out_trade_no + "</out_trade_no>";//商户订单号
-            formData += "<spbill_create_ip>61.50.221.43</spbill_create_ip>";//终端IP
-            formData += "<total_fee>" + total_fee + "</total_fee>";//支付金额单位为（分）
-            formData += "<trade_type>JSAPI</trade_type>";//交易类型(JSAPI--公众号支付)
-            formData += "<sign>" + strMD5 + "</sign>"; //签名
-            formData += "</xml>";
+            param.sign = strMD5;
+
+            var formData = XMLConvert.ToXml(param);
             // 请求数据
             var getdata = sendPost(url, formData);
             //获取xml数据
@@ -82,17 +106,18 @@ namespace Common.Tool
                     //prepay_id
                     string prepay_id = xmlNode["prepay_id"].InnerText;
                     //再次签名返回数据至小程序
-                    string strB = "appId=" + appid + "&nonceStr=" + nonce_str + "&package=prepay_id=" + prepay_id + "&signType=MD5&timeStamp=" + _time + "&key=" + partnerkey;
+                    //string strB = "appId=" + param.appid + "&nonceStr=" + param.nonce_str + "&package=prepay_id=" + prepay_id + "&signType=MD5&timeStamp=" + _time + "&key=" + partnerkey;
                     #endregion
                     w.Result = "Success";
                     w.ErrMsg = "统一下单成功";
                     w.TimeStamp = _time;
-                    w.NonceStr = nonce_str;
+                    w.NonceStr = param.nonce_str;
                     w.PrepayId = "prepay_id=" + prepay_id;
-                    w.Sign = MD5(strB).ToUpper(); ;
+                    //w.Sign = MD5(strB).ToUpper(); ;
                     w.SignType = "MD5";
                     w.TradeType = "JSAPI";
-                    w.OutTradeNo = out_trade_no;
+                    w.AppId = param.appid;
+                    w.OutTradeNo = param.out_trade_no;
                 }
                 else
                 {
@@ -106,7 +131,7 @@ namespace Common.Tool
                 w.Result = "Error";
                 w.ErrMsg = "统一下单失败";
             }
-            return JsonConvert.SerializeObject(w);
+            return w;
         }
         /// <summary>
         /// 获取时间戳
