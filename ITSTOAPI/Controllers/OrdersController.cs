@@ -18,11 +18,13 @@ namespace ITSTOAPI.Controllers
         private readonly ILog _log;
         private readonly IOrdersService ordersService;
         private readonly ICustomerService customerService;
-        public OrdersController(IOrdersService ordersService, ICustomerService customerService)
+        private readonly IDishService dishService;
+        public OrdersController(IOrdersService ordersService, ICustomerService customerService, IDishService dishService)
         {
             this._log = LogManager.GetLogger(typeof(OrdersController));
             this.ordersService = ordersService;
             this.customerService = customerService;
+            this.dishService = dishService;
         }
 
         [HttpPost]
@@ -72,11 +74,11 @@ namespace ITSTOAPI.Controllers
                 response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Scene不能为空");
                 return Ok(response);
             }
-            if (orders.Status == 0)
-            {
-                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Status不能为空");
-                return Ok(response);
-            }
+            //if (orders.Status == 0)
+            //{
+            //    response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Status不能为空");
+            //    return Ok(response);
+            //}
             if (orders.OrderDetailList == null)
             {
                 response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "OrderDetailList不能为空");
@@ -94,21 +96,25 @@ namespace ITSTOAPI.Controllers
                     response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Amount不能为空");
                     return Ok(response);
                 }
-                if (item.OriginalAmount == 0)
-                {
-                    response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "OriginalAmount不能为空");
-                    return Ok(response);
-                }
-                if (item.ActualAmount == 0)
-                {
-                    response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "ActualAmount不能为空");
-                    return Ok(response);
-                }
+                //if (item.OriginalAmount == 0)
+                //{
+                //    response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "OriginalAmount不能为空");
+                //    return Ok(response);
+                //}
+                //if (item.ActualAmount == 0)
+                //{
+                //    response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "ActualAmount不能为空");
+                //    return Ok(response);
+                //}
+                var dish = dishService.GetDishByDishCode(item.DishCode);
+                item.OriginalAmount = (double)dish.UnitPrice * item.Amount;
+                item.ActualAmount = (double)dish.DiscountPrice * item.Amount;
             }
             #endregion
             //生成ordercode
             string orderCode = DateTime.Now.ToString("yyyyMMddHHmmss") + new Random(System.Environment.TickCount).Next(100000, 999999);
             orders.OrderCode = orderCode;
+            orders.Status = 1;
             orders.CreateUser = "yjl";
             orders.CreateDate = DateTime.Now;
             orders.LastUpdateUser = "yjl";

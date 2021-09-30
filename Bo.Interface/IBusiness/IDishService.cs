@@ -9,5 +9,6 @@ namespace Bo.Interface.IBusiness
     public interface IDishService
     {
         IQueryable<Dish> GetAllDishs(Dish dish);
+        Dish GetDishByDishCode(string dishCode);
     }
 }

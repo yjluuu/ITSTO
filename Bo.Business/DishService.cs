@@ -23,5 +23,10 @@ namespace Bo.Business
         {
             return dishService.Where(d => !d.IsDeleted && d.Brand == dish.Brand);
         }
+
+        public Dish GetDishByDishCode(string dishCode)
+        {
+            return dishService.FirstOrDefault(d => !d.IsDeleted && d.DishCode == dishCode);
+        }
     }
 }
