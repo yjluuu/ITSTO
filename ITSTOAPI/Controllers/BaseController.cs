@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace ITSTOAPI.Controllers
 {
     [Route("api/[controller]/[action]")]
-    //[TypeFilter(typeof(CustomActionFilterAttribute))]
+    [TypeFilter(typeof(CustomAuthorization))]
     [ApiController]
     public class BaseController : ControllerBase
     {

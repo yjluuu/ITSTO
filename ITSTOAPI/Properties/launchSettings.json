@@ -12,7 +12,7 @@
     "ITSTOAPI": {
       "commandName": "Project",
       "launchBrowser": true,
-      //"launchUrl": "api/User/Login",
+      "launchUrl": "api/User/Login",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

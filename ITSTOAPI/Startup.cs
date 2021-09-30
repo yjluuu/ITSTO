@@ -46,7 +46,7 @@ namespace ITSTOAPI
             RedisClient.redisClient.InitConnect(Configuration);
             services.AddControllers(options => { options.Filters.Add(typeof(CustomResourceAttribute)); });
             //添加全局的Authorization过滤器
-            services.AddControllers(options => { options.Filters.Add(typeof(CustomAuthorization)); });
+            //services.AddControllers(options => { options.Filters.Add(typeof(CustomAuthorization)); });
             //添加全局的Action过滤器
             services.AddControllers(options => { options.Filters.Add(typeof(CustomActionFilterAttribute)); });
             //添加全局的Exception过滤器

@@ -15,18 +15,18 @@ namespace ITSTOAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly ITestService testService;
-        private readonly IMapper mapper;
-        public UserController(ITestService testService, IMapper mapper)
-        {
-            this.testService = testService;
-            this.mapper = mapper;
-        }
+        //private readonly ITestService testService;
+        //private readonly IMapper mapper;
+        //public UserController(ITestService testService, IMapper mapper)
+        //{
+        //    this.testService = testService;
+        //    this.mapper = mapper;
+        //}
 
         [HttpGet]
         public IActionResult Login()
         {
-            var ssss = testService.GetTests();
+            //var ssss = testService.GetTests();
             //testService.Insert();
             return Ok("hello");
         }
