@@ -71,6 +71,7 @@ namespace ITSTOAPI.Controllers
                 var cc = customerService.GetCustomerChannelByOpenId(openid);
                 if (cc == null)
                 {
+                    _log.Info($"{register.JsCode}获取到的openid：{openid}，新增");
                     register.OpenId = openid;
                     register.UnionId = unionid;
                     register.SessionKey = sessionKey;
@@ -88,6 +89,17 @@ namespace ITSTOAPI.Controllers
                 }
                 else
                 {
+                    _log.Info($"{register.JsCode}获取到的openid：{openid}已存在，更新会员信息并返回usercode{cc.UserCode}");
+                    var c = customerService.GetCustomerByUserCode(cc.UserCode);
+                    _log.Info($"{register.JsCode}获取到的openid：{openid}已存在，已存在的会员信息{JsonConvert.SerializeObject(c)}");
+                    c.NickName = register.NickName;
+                    c.HeadImageUrl = register.HeadImageUrl;
+                    c.Gender = register.Gender;
+                    c.ProvinceName = register.ProvinceName;
+                    c.CityName = register.CityName;
+                    c.CountryName = register.CountryName;
+                    _log.Info($"{register.JsCode}获取到的openid：{openid}已存在，要更新的会员信息{JsonConvert.SerializeObject(c)}");
+                    customerService.UpdateCustomerByUserCode(c);
                     response.ReturnObj = new { UserCode = cc.UserCode };
                     return Ok(response);
                 }

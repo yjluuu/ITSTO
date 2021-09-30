@@ -12,5 +12,8 @@ namespace Bo.Interface.IBusiness
         CustomerChannel GetCustomerChannelByUserCode(string userCode);
         CustomerChannel GetCustomerChannelByOpenId(string openId);
         Customer GetCustomerByUserCode(string userCode);
+
+        void UpdateCustomerByUserCode(Customer c);
+
     }
 }

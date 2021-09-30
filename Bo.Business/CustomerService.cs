@@ -73,6 +73,12 @@ namespace Bo.Business
         }
 
 
+        public void UpdateCustomerByUserCode(Customer c)
+        {
+            customerService.Update(c);
+        }
+
+
         public CustomerChannel GetCustomerChannelByUserCode(string userCode)
         {
             return customerChannelService.FirstOrDefault(cc => !cc.IsDeleted && cc.UserCode == userCode);
