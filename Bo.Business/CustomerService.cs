@@ -37,6 +37,9 @@ namespace Bo.Business
                 Gender = register.Gender,
                 Age = register.Age,
                 Birthday = register.Birthday,
+                ProvinceName = register.ProvinceName,
+                CityName = register.CityName,
+                CountryName = register.CountryName,
                 CreateUser = "yjl",
                 CreateDate = DateTime.Now,
                 LastUpdateUser = "yjl",
@@ -73,6 +76,16 @@ namespace Bo.Business
         public CustomerChannel GetCustomerChannelByUserCode(string userCode)
         {
             return customerChannelService.FirstOrDefault(cc => !cc.IsDeleted && cc.UserCode == userCode);
+        }
+
+        public CustomerChannel GetCustomerChannelByOpenId(string openId)
+        {
+            return customerChannelService.FirstOrDefault(cc => !cc.IsDeleted && cc.OpenId == openId);
+        }
+
+        public Customer GetCustomerByUserCode(string userCode)
+        {
+            return customerService.FirstOrDefault(c => !c.IsDeleted && c.UserCode == userCode);
         }
     }
 }

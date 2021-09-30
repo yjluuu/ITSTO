@@ -17,10 +17,12 @@ namespace ITSTOAPI.Controllers
     {
         private readonly ILog _log;
         private readonly IOrdersService ordersService;
-        public OrdersController(IOrdersService ordersService)
+        private readonly ICustomerService customerService;
+        public OrdersController(IOrdersService ordersService, ICustomerService customerService)
         {
             this._log = LogManager.GetLogger(typeof(OrdersController));
             this.ordersService = ordersService;
+            this.customerService = customerService;
         }
 
         [HttpPost]
@@ -49,6 +51,12 @@ namespace ITSTOAPI.Controllers
                 response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "UserCode不能为空");
                 return Ok(response);
             }
+            var c = customerService.GetCustomerByUserCode(orders.UserCode);
+            if (c == null)
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.ParamError, "UserCode不存在");
+                return Ok(response);
+            }
             if (orders.OriginalAmount == 0)
             {
                 response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "OriginalAmount不能为空");
@@ -59,9 +67,14 @@ namespace ITSTOAPI.Controllers
                 response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "ActualAmount不能为空");
                 return Ok(response);
             }
-            if (orders.OrderType == 0)
+            if (string.IsNullOrEmpty(orders.Scene))
             {
-                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "OrderType不能为空");
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Scene不能为空");
+                return Ok(response);
+            }
+            if (orders.Status == 0)
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Status不能为空");
                 return Ok(response);
             }
             if (orders.OrderDetailList == null)

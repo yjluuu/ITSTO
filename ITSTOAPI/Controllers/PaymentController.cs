@@ -61,6 +61,12 @@ namespace ITSTOAPI.Controllers
             #endregion
 
             var order = ordersService.GetOrderByOrderCode(request.OrderCode);
+            if (order == null)
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.ParamError, "OrderCode不存在");
+                return Ok(response);
+            }
+
             WechatOrderPayParam payParam = new WechatOrderPayParam
             {
                 appid = channelService.GetChannelByBrand(request.Brand).AppId,

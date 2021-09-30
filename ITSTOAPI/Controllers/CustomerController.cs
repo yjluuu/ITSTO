@@ -31,22 +31,25 @@ namespace ITSTOAPI.Controllers
         public IActionResult CustomerRegister(RequestCustomerRegister register)
         {
             ApiBaseResponse response = new ApiBaseResponse();
+            string openid = string.Empty;
+            string unionid = string.Empty;
+            string sessionKey = string.Empty;
             #region 校验入参
             if (string.IsNullOrEmpty(register.Brand))
             {
                 response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Brand不能为空");
                 return Ok(response);
             }
-            if (string.IsNullOrEmpty(register.NickName))
-            {
-                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "NickName不能为空");
-                return Ok(response);
-            }
-            if (string.IsNullOrEmpty(register.HeadImageUrl))
-            {
-                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "HeadImageUrl不能为空");
-                return Ok(response);
-            }
+            //if (string.IsNullOrEmpty(register.NickName))
+            //{
+            //    response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "NickName不能为空");
+            //    return Ok(response);
+            //}
+            //if (string.IsNullOrEmpty(register.HeadImageUrl))
+            //{
+            //    response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "HeadImageUrl不能为空");
+            //    return Ok(response);
+            //}
             if (string.IsNullOrEmpty(register.JsCode))
             {
                 response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "JsCode不能为空");
@@ -60,18 +63,41 @@ namespace ITSTOAPI.Controllers
             var code2SessionReturnObj = JsonConvert.DeserializeObject<dynamic>(code2SessionReturn);
             if (code2SessionReturnObj["errcode"] == null)
             {
-                register.OpenId = code2SessionReturnObj["openid"];
-                register.UnionId = code2SessionReturnObj["unionid"];
-                register.SessionKey = code2SessionReturnObj["session_key"];
+                openid = code2SessionReturnObj["openid"];
+                unionid = code2SessionReturnObj["unionid"];
+                sessionKey = code2SessionReturnObj["session_key"];
+
+                //判断openid是否已经注册
+                var cc = customerService.GetCustomerChannelByOpenId(openid);
+                if (cc == null)
+                {
+                    register.OpenId = openid;
+                    register.UnionId = unionid;
+                    register.SessionKey = sessionKey;
+                    string userCode = customerService.CustomerRegister(register);
+                    if (!string.IsNullOrEmpty(userCode))
+                    {
+                        response.ReturnObj = new { UserCode = userCode };
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.SystemError, "注册失败");
+                        return Ok(response);
+                    }
+                }
+                else
+                {
+                    response.ReturnObj = new { UserCode = cc.UserCode };
+                    return Ok(response);
+                }
             }
-            string userCode = customerService.CustomerRegister(register);
-            if (!string.IsNullOrEmpty(userCode))
+            else
             {
-                response.ReturnObj = new { UserCode = userCode };
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.SystemError, "注册失败");
                 return Ok(response);
             }
-            response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.SystemError, "注册失败");
-            return Ok(response);
+
         }
     }
 }

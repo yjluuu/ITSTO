@@ -10,5 +10,7 @@ namespace Bo.Interface.IBusiness
     {
         string CustomerRegister(RequestCustomerRegister register);
         CustomerChannel GetCustomerChannelByUserCode(string userCode);
+        CustomerChannel GetCustomerChannelByOpenId(string openId);
+        Customer GetCustomerByUserCode(string userCode);
     }
 }

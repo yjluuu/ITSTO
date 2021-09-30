@@ -14,6 +14,9 @@ namespace Routine.Models.ApiEntityRequest
         public string Gender { get; set; }
         public int Age { get; set; }
         public DateTime? Birthday { get; set; }
+        public string ProvinceName { get; set; }
+        public string CityName { get; set; }
+        public string CountryName { get; set; }
         public string UnionId { get; set; }
         public string OpenId { get; set; }
         public string SessionKey { get; set; }
