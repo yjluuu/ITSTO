@@ -94,8 +94,8 @@ namespace ITSTOAPI.Controllers
                 profit_sharing = string.Empty,
                 scene_info = string.Empty,
             };
-            var result = WXOrderPayForHelper.Getprepay(payParam, Configuration["PartnerKey"], appSettingService.GetAppSettingByKey(request.Brand, "WeChatPayForUrl")?.AppSettingValue);
-            return Ok(result);
+            response.ReturnObj = WXOrderPayForHelper.Getprepay(payParam, Configuration["PartnerKey"], appSettingService.GetAppSettingByKey(request.Brand, "WeChatPayForUrl")?.AppSettingValue);
+            return Ok(response);
         }
 
         public int Test()

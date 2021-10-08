@@ -106,14 +106,14 @@ namespace Common.Tool
                     //prepay_id
                     string prepay_id = xmlNode["prepay_id"].InnerText;
                     //再次签名返回数据至小程序
-                    //string strB = "appId=" + param.appid + "&nonceStr=" + param.nonce_str + "&package=prepay_id=" + prepay_id + "&signType=MD5&timeStamp=" + _time + "&key=" + partnerkey;
+                    string strB = "appId=" + param.appid + "&nonceStr=" + param.nonce_str + "&package=prepay_id=" + prepay_id + "&signType=MD5&timeStamp=" + _time + "&key=" + partnerkey;
                     #endregion
                     w.Result = "Success";
                     w.ErrMsg = "统一下单成功";
                     w.TimeStamp = _time;
                     w.NonceStr = param.nonce_str;
                     w.PrepayId = "prepay_id=" + prepay_id;
-                    //w.Sign = MD5(strB).ToUpper(); ;
+                    w.Sign = MD5(strB).ToUpper(); ;
                     w.SignType = "MD5";
                     w.TradeType = "JSAPI";
                     w.AppId = param.appid;

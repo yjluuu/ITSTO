@@ -30,7 +30,7 @@ namespace Routine.Models.ApiEntityResponse
         /// <summary>
         /// 第二次签名
         /// </summary>
-        //public string Sign { get; set; }
+        public string Sign { get; set; }
         /// <summary>
         /// 签名方式
         /// </summary>
