@@ -14,6 +14,8 @@ namespace Common.Tool
             CreateMap<Store, ResponseStore>();
             CreateMap<DishCategory, ResponseDishCategory>();
             CreateMap<Dish, ResponseDish>();
+            CreateMap<Orders, ResponseOrders>();
+            CreateMap<OrderDetail, ResponseOrderDetail>();
         }
     }
 }

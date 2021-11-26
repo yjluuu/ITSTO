@@ -1,4 +1,5 @@
-﻿using Bo.Interface.IBusiness;
+﻿using AutoMapper;
+using Bo.Interface.IBusiness;
 using log4net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,14 @@ namespace ITSTOAPI.Controllers
     public class OrdersController : BaseController
     {
         private readonly ILog _log;
+        private readonly IMapper mapper;
         private readonly IOrdersService ordersService;
         private readonly ICustomerService customerService;
         private readonly IDishService dishService;
-        public OrdersController(IOrdersService ordersService, ICustomerService customerService, IDishService dishService)
+        public OrdersController(IMapper mapper, IOrdersService ordersService, ICustomerService customerService, IDishService dishService)
         {
             this._log = LogManager.GetLogger(typeof(OrdersController));
+            this.mapper = mapper;
             this.ordersService = ordersService;
             this.customerService = customerService;
             this.dishService = dishService;
@@ -138,6 +141,60 @@ namespace ITSTOAPI.Controllers
             return Ok(response);
         }
 
+        [HttpPost]
+        public IActionResult GetOrdersByUserCode(Orders param)
+        {
+            ApiBaseResponse response = new ApiBaseResponse();
+            #region 验证参数
+            if (param == null)
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "参数不能为空");
+                return Ok(response);
+            }
+            if (string.IsNullOrEmpty(param.Brand))
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Brand不能为空");
+                return Ok(response);
+            }
+            if (string.IsNullOrEmpty(param.UserCode))
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "UserCode不能为空");
+                return Ok(response);
+            }
+            #endregion
+            var os = ordersService.GetOrdersByUserCode(param);
+            var returnOrders = mapper.Map<List<ResponseOrders>>(os);
+            response.ReturnObj = returnOrders.OrderByDescending(t => t.CreateDate);
+            return Ok(response);
+        }
 
+        [HttpPost]
+        public IActionResult GetOrderDetailsByOrderCode(Orders param)
+        {
+            ApiBaseResponse response = new ApiBaseResponse();
+            #region 验证参数
+            if (param == null)
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "参数不能为空");
+                return Ok(response);
+            }
+            if (string.IsNullOrEmpty(param.Brand))
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "Brand不能为空");
+                return Ok(response);
+            }
+            if (string.IsNullOrEmpty(param.OrderCode))
+            {
+                response.GetErrorApiBaseResponse(ApiBaseResponseStatusCodeEnum.NoDetailedInfo, "OrderCode不能为空");
+                return Ok(response);
+            }
+            #endregion
+            var od = ordersService.GetOrderDetailsByOrderCode(param);
+            var mappedOrderDetail = mapper.Map<List<ResponseOrderDetail>>(od);
+            var dish = dishService.GetAllDishs(new Dish { Brand = param.Brand });
+            mappedOrderDetail.ForEach(mod => mod.DishName = (dish.Where(d => d.DishCode == mod.DishCode).FirstOrDefault()?.DishName));
+            response.ReturnObj = mappedOrderDetail;
+            return Ok(response);
+        }
     }
 }

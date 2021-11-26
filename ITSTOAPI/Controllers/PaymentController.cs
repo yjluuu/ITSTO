@@ -1,5 +1,6 @@
 ﻿using Bo.Interface.IBusiness;
 using Common.Tool;
+using ITSTOAPI.Attribute;
 using log4net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,8 @@ using Routine.Models.EnmuEntity;
 using Routine.Models.Entity.WeChat;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -19,7 +22,9 @@ using System.Xml;
 
 namespace ITSTOAPI.Controllers
 {
-    public class PaymentController : BaseController
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    public class PaymentController : Controller
     {
         private IConfiguration Configuration { get; }
         private readonly ILog _log;
@@ -39,6 +44,7 @@ namespace ITSTOAPI.Controllers
         }
 
         [HttpPost]
+        [TypeFilter(typeof(CustomAuthorization))]
         public IActionResult PayForOrders(RequestPayForOrders request)
         {
             ApiBaseResponse response = new ApiBaseResponse();
@@ -80,7 +86,7 @@ namespace ITSTOAPI.Controllers
                 attach = string.Empty,
                 out_trade_no = request.OrderCode,
                 fee_type = "CNY",
-                total_fee = (int)order?.ActualAmount * 100,
+                total_fee = (int)(order?.ActualAmount * 100),
                 spbill_create_ip = "127.0.0.1"/*!string.IsNullOrEmpty(HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()) ? HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() : HttpContext.Connection.RemoteIpAddress.ToString()*/,
                 time_start = DateTime.Now.ToString("yyyyMMddHHmmss"),
                 time_expire = DateTime.Now.AddMinutes(5).ToString("yyyyMMddHHmmss"),
@@ -94,13 +100,69 @@ namespace ITSTOAPI.Controllers
                 profit_sharing = string.Empty,
                 scene_info = string.Empty,
             };
+            _log.Info($"调用微信统一下单接口入参：{JsonConvert.SerializeObject(payParam)}");
             response.ReturnObj = WXOrderPayForHelper.Getprepay(payParam, Configuration["PartnerKey"], appSettingService.GetAppSettingByKey(request.Brand, "WeChatPayForUrl")?.AppSettingValue);
+            _log.Info($"调用微信统一下单接口返回：{JsonConvert.SerializeObject(response.ReturnObj)}");
             return Ok(response);
         }
 
-        public int Test()
+
+        [HttpPost]
+        public void PayForOrdersNotify()
         {
-            return 1;
+            //获取请求参数
+            var buffer = new MemoryStream();
+            Request.Body.CopyToAsync(buffer);
+            var xmlData = Encoding.UTF8.GetString(buffer.GetBuffer());
+
+            if (!string.IsNullOrEmpty(xmlData))
+            {
+                var xml = new XmlDocument();
+                xml.LoadXml(xmlData);
+                //处理返回的值
+                DataSet ds = new DataSet();
+                StringReader stram = new StringReader(xmlData);
+                XmlTextReader reader = new XmlTextReader(stram);
+                ds.ReadXml(reader);
+                string return_code = ds.Tables[0].Rows[0]["return_code"].ToString();
+                if (return_code.ToUpper() == "SUCCESS")
+                {
+                    //通信成功  
+                    string result_code = ds.Tables[0].Rows[0]["result_code"].ToString();//业务结果  
+                    if (result_code.ToUpper() == "SUCCESS")
+                    {
+                        try
+                        {
+                            _log.Info($"付款成功:{xmlData}");
+                            string orderCode = ds.Tables[0].Rows[0]["out_trade_no"].ToString();
+                            //微信回调会一直调接口，判断一下status
+                            var o = ordersService.GetOrderByOrderCodeAndStatus(orderCode, 1);
+                            if (o != null)
+                            {
+                                o.Status = 2;
+                                o.PayTime = DateTime.Now;
+                                o.PayType = 1;
+                                o.LastUpdateDate = DateTime.Now;
+                                ordersService.UpdateOrderStatusByOrderCode(o);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _log.Error(ex.ToString());
+                        }
+                    }
+                    else
+                    {
+                        _log.Error("支付失败:" + xmlData);
+                    }
+                }
+                else
+                {
+                    _log.Error("支付失败:" + xmlData);
+                }
+            }
+
+
         }
     }
 }

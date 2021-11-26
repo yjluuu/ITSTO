@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Routine.Models.ApiEntityResponse;
 using Routine.Models.Entity.WeChat;
 using System;
@@ -14,6 +15,7 @@ namespace Common.Tool
 {
     public class WXOrderPayForHelper
     {
+        private static readonly ILogger _log = new Log4NetProvider().CreateLogger();
         /// <summary>
         /// 微信支付调用方法
         /// </summary>
@@ -46,6 +48,7 @@ namespace Common.Tool
 
         public static ResponseWXOrderPayFor Getprepay(WechatOrderPayParam param, string partnerkey, string url)
         {
+
             Dictionary<string, string> map = new Dictionary<string, string>();
             Type t = param.GetType(); // 获取对象对应的类， 对应的类型
             PropertyInfo[] pi = t.GetProperties(BindingFlags.Public | BindingFlags.Instance); // 获取当前type公共属性
@@ -91,6 +94,7 @@ namespace Common.Tool
             var formData = XMLConvert.ToXml(param);
             // 请求数据
             var getdata = sendPost(url, formData);
+            _log.LogInformation($"调用微信统一下单接口：{getdata}");
             //获取xml数据
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(getdata);

@@ -75,5 +75,25 @@ namespace Bo.Business
         {
             return orderService.Where(o => !o.IsDeleted && o.OrderCode == orderCode).FirstOrDefault();
         }
+
+        public Orders GetOrderByOrderCodeAndStatus(string orderCode, int status)
+        {
+            return orderService.Where(o => !o.IsDeleted && o.OrderCode == orderCode && o.Status == status).FirstOrDefault();
+        }
+
+        public void UpdateOrderStatusByOrderCode(Orders o)
+        {
+            orderService.Update(o);
+        }
+
+        public List<Orders> GetOrdersByUserCode(Orders param)
+        {
+            return orderService.Where(o => !o.IsDeleted && o.Brand == param.Brand && o.UserCode == param.UserCode).ToList();
+        }
+
+        public List<OrderDetail> GetOrderDetailsByOrderCode(Orders param)
+        {
+            return orderDetailService.Where(od => !od.IsDeleted && od.OrderCode == param.OrderCode).ToList();
+        }
     }
 }
